@@ -59,6 +59,7 @@ SDL_Color font_color = { 0xff,0xff,0xff,0xff };
 std::string title_string = "WANGAN MIDNIGHT MAXIMUM TUNE 5DX Plus";
 std::string revision_string = "REV 3.09.01";
 std::string content_string = "Strating Initialization ......";
+std::string content_string_array[10];
 
 // Func
 void clearScreenAndRepaint();
@@ -132,12 +133,10 @@ void clearScreenAndRepaint() {
 void renderText() {
     SDL_Surface* s_titleText = TTF_RenderText_Blended(font_title, title_string.c_str(), title_string.length(), font_color);
     SDL_Surface* s_revisionText = TTF_RenderText_Blended(font_title, revision_string.c_str(), revision_string.length(), font_color);
-    SDL_Surface* s_contentText = TTF_RenderText_Blended(font_content, content_string.c_str(), content_string.length(), font_color);
     SDL_Texture* t_titleText = SDL_CreateTextureFromSurface(renderer, s_titleText);
     SDL_Texture* t_revisionText = SDL_CreateTextureFromSurface(renderer, s_revisionText);
-    SDL_Texture* t_contentText = SDL_CreateTextureFromSurface(renderer, s_contentText);
-
-    float w_tt, h_tt, w_rt, h_rt, w_ct, h_ct;
+    
+    float w_tt, h_tt, w_rt, h_rt;
 
     SDL_GetTextureSize(t_titleText, &w_tt, &h_tt);
     SDL_FRect r_tt = { (screen_x - w_tt)/2.0f ,282,w_tt + 5,h_tt };
@@ -147,9 +146,20 @@ void renderText() {
     SDL_FRect r_rt = { (screen_x - w_rt) / 2.0f ,303,w_rt + 5,h_rt };
     SDL_RenderTexture(renderer, t_revisionText, nullptr, &r_rt);
 
+    SDL_Surface* s_contentText = TTF_RenderText_Blended(font_content, content_string.c_str(), content_string.length(), font_color);
+    SDL_Texture* t_contentText = SDL_CreateTextureFromSurface(renderer, s_contentText);
+    float w_ct, h_ct;
     SDL_GetTextureSize(t_contentText, &w_ct, &h_ct);
     SDL_FRect r_ct = { 402 , 469 ,w_ct + 3,h_ct };
     SDL_RenderTexture(renderer, t_contentText, nullptr, &r_ct);
+
+    // Prevent Memeory Leak
+    SDL_DestroyTexture(t_titleText);
+    SDL_DestroyTexture(t_revisionText);
+    SDL_DestroySurface(s_titleText);
+    SDL_DestroySurface(s_revisionText);
+    SDL_DestroyTexture(t_contentText);
+    SDL_DestroySurface(s_contentText);
 }
 
 static int loadingThreadFunction(void* data) {
