@@ -2,6 +2,7 @@
 #include <string>
 
 #include "resource.hpp"
+#include "message_queue.hpp"
 
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -12,6 +13,20 @@ int main(int argc, char* argv[]) {
     TTF_Init();
 
     initResource();
+
+    MessageQueue queue;
+    queue.push("System Initialization .......");
+    queue.push("    Get Hops               : Completed");
+    queue.push("    Router name resolution : Completed");
+    queue.push("    Server name resolution : Completed");
+    queue.push("    System setup           : In progress");
+    queue.push("    AMauthd services       : Not Connected");
+
+    auto msgVector = queue.getAllMessagesAsVector();
+    for (const auto& msg : msgVector) {
+        std::cout << msg << std::endl;
+    }
+
 
     int precentage = 0;
     while (true) {

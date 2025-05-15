@@ -23,5 +23,8 @@
     <ClInclude Include="resource.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="message_queue.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
