@@ -116,7 +116,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\DevelopDependences\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\DevelopDependences\SDL2\lib\x64\SDL3.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_test.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\DevelopDependences\SDL2\lib\x64\SDL3.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_test.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_image.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,11 +134,14 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\DevelopDependences\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>C:\DevelopDependences\SDL2\lib\x64\SDL3.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_test.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\DevelopDependences\SDL2\lib\x64\SDL3.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_test.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_image.lib;C:\DevelopDependences\SDL2\lib\x64\SDL3_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
