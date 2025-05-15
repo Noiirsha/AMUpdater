@@ -8,6 +8,10 @@
 
 CSimpleIniA AMConfig;
 
+void AMConfigDebugStringA(std::string str) {
+	std::cout << "[ INI ] " + str << std::endl;
+}
+
 void AMConfig_Init() {
 	SI_Error rc = AMConfig.LoadFile("./AMConfig.ini");
 	if (rc < 0) { 
@@ -23,6 +27,11 @@ std::string AMConfig_GetRevision() {
 	std::string rev = game_rev;
 	std::string ver = game_ver;
 
+#ifdef _DEBUG
+	AMConfigDebugStringA(rev + "." + ver);
+#endif // _DEBUG
+
+
 	return rev + "." + ver;
 }
 
@@ -30,14 +39,33 @@ std::string AMConfig_GetServer() {
 
 	const char* auth_server_url = AMConfig.GetValue("MuchaCAConfig", "cacfg-auth_server_url", "http://error/");
 
+#ifdef _DEBUG
+	AMConfigDebugStringA(auth_server_url);
+#endif // _DEBUG
+
 	return auth_server_url;
+}
+
+int AMConfig_GetCountdown() {
+
+	const char* countdown_time = AMConfig.GetValue("AMUpdaterConfig", "amucfg-countdown", "5");
+
+#ifdef _DEBUG
+	AMConfigDebugStringA(countdown_time);
+#endif // _DEBUG
+
+	return std::stod(countdown_time);
 }
 
 std::string AMConfig_GetGameTitle() {
 
 	const char* title = AMConfig.GetValue("AMUpdaterConfig", "amucfg-title", "NO GAME");
-	return title;
 
+#ifdef _DEBUG
+	AMConfigDebugStringA(title);
+#endif // _DEBUG
+
+	return title;
 }
 
 std::string AMConfig_GetNetId() {
@@ -52,6 +80,10 @@ std::string AMConfig_GetNetId() {
 	}
 
 	const char* netId = WritableConfig.GetValue("RuntimeConfig", "netID", "");
+
+#ifdef _DEBUG
+	AMConfigDebugStringA(netId);
+#endif // _DEBUG
 
 	return netId;
 }
@@ -68,6 +100,10 @@ std::string AMConfig_GetSerial() {
 	}
 
 	const char* serial = WritableConfig.GetValue("RuntimeConfig", "serialID", "");
+
+#ifdef _DEBUG
+	AMConfigDebugStringA(serial);
+#endif // _DEBUG
 
 	return serial;
 }

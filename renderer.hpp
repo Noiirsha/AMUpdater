@@ -56,7 +56,7 @@ SDL_FRect r_rbar;
 SDL_Thread* loading_thread = nullptr;
 bool loading_active = true;
 float rotation_angle = 0.0f;
-float rotation_speed = 1.5f; // ÉÔÎ¢¼Ó¿ìÐý×ªËÙ¶È
+float rotation_speed = 1.5f; // ç¨å¾®åŠ å¿«æ—‹è½¬é€Ÿåº¦
 SDL_Mutex* rotation_mutex = nullptr;
 
 // TTF
@@ -65,7 +65,6 @@ TTF_Font* font_content;
 SDL_Color font_color = { 0xff,0xff,0xff,0xff };
 std::string title_string = "";
 std::string revision_string = "";
-MessageQueue content_strings;
 
 // Func
 void clearScreenAndRepaint();
@@ -164,7 +163,7 @@ void renderText() {
         SDL_Texture* t_contentText = SDL_CreateTextureFromSurface(renderer, s_contentText);
         float w_ct, h_ct;
         SDL_GetTextureSize(t_contentText, &w_ct, &h_ct);
-        SDL_FRect r_ct = { 402 , 467 + h_ct*idx ,w_ct + 3,h_ct };
+        SDL_FRect r_ct = { 402 , 467 + h_ct*idx ,w_ct,h_ct };
         SDL_RenderTexture(renderer, t_contentText, nullptr, &r_ct);
         idx++;
         SDL_DestroyTexture(t_contentText);
@@ -188,7 +187,7 @@ static int loadingThreadFunction(void* data) {
         }
         SDL_UnlockMutex(rotation_mutex);
 
-        SDL_Delay(16); // Ô¼60FPS
+        SDL_Delay(16); // çº¦60FPS
     }
     return 0;
 }
@@ -203,11 +202,11 @@ void renderLoading() {
 
 void renderProgressBar() {
 
-    // äÖÈ¾½ø¶ÈÌõÖÐ¼ä²¿·Ö
+    // æ¸²æŸ“è¿›åº¦æ¡ä¸­é—´éƒ¨åˆ†
     if (precentage > 0) {
         SDL_RenderTexture(renderer, t_lbar, nullptr, &r_lbar);
 
-        float progress_width = w_cbar * (precentage / 100.0f) * 61.5f; // Ê¹ÓÃ¸¡µãÊý³ý·¨
+        float progress_width = w_cbar * (precentage / 100.0f) * 61.5f; // ä½¿ç”¨æµ®ç‚¹æ•°é™¤æ³•
         SDL_FRect r_cbar = {
             438,
             432,

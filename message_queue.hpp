@@ -38,7 +38,21 @@ public:
         return result;
     }
 
+    void overwriteLatest(const std::string& newContent) {
+        if (currentSize == 0) {
+            push(newContent);  // 队列为空，直接添加
+        }
+        else {
+            // 计算最新消息的位置
+            int latestIndex = (oldestIndex + currentSize - 1) % MAX_SIZE;
+            messages[latestIndex] = newContent;
+        }
+    }
+
     int size() const {
         return currentSize;
     }
+
 };
+
+MessageQueue content_strings;

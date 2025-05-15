@@ -1,12 +1,23 @@
-#pragma once
+/*
+    OpenSSL is required
+*/
+
+#define WIN32_LEAN_AND_MEAN
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
 #include <iostream>
 #include <string>
 #include <thread>
 
-#include "resource.hpp"
+#include "renderer.hpp"
 #include "message_queue.hpp"
 #include "AMConfig.hpp"
+#include "updater_network.hpp"
 
+#pragma comment(lib, "ws2_32.lib")
+
+#ifdef _DEBUG
 // test func
 void inputThreadFunc() {
     std::string userInput;
@@ -16,14 +27,21 @@ void inputThreadFunc() {
         content_strings.push(userInput);
     }
 }
+#endif
+
+void startUpdateFunc() {
+    updateNetwork.startNetworkUpdater();
+}
 
 int main(int argc, char* argv[]) {
     /*
-        Config Init
+        Config Init and Network Init
     */
     AMConfig_Init();
     title_string = AMConfig_GetGameTitle();
     revision_string = "REV " + AMConfig_GetRevision();
+
+    updateNetwork.init(AMConfig_GetServer(), AMConfig_GetNetId(), AMConfig_GetSerial(), AMConfig_GetCountdown());
 
     /*
         Graphics Init
@@ -37,14 +55,15 @@ int main(int argc, char* argv[]) {
 
     initResource();
 
+#ifdef _DEBUG
     // Debug: Test For Message Queue
     std::thread inputThread(inputThreadFunc);
     inputThread.detach();
+#endif // _DEBUG
 
-    auto msgVector = content_strings.getAllMessagesAsVector();
-    for (const auto& msg : msgVector) {
-        std::cout << msg << std::endl;
-    }
+    // Start Updater Network Process
+    std::thread networkUpdater(startUpdateFunc);
+    networkUpdater.detach();
 
     while (true) {
 
