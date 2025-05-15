@@ -3,9 +3,16 @@
 #include <SDL3_image/SDL_image.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include "message_queue.hpp"
 
 #define screen_x 1366
 #define screen_y 768
+
+/*
+    For Progress bar usage
+    Used if network is required to download the latest data
+*/
+int precentage = 0;
 
 // Resources
 SDL_Window* window;
@@ -56,10 +63,9 @@ SDL_Mutex* rotation_mutex = nullptr;
 TTF_Font* font_title;
 TTF_Font* font_content;
 SDL_Color font_color = { 0xff,0xff,0xff,0xff };
-std::string title_string = "WANGAN MIDNIGHT MAXIMUM TUNE 5DX Plus";
-std::string revision_string = "REV 3.09.01";
-std::string content_string = "Strating Initialization ......";
-std::string content_string_array[10];
+std::string title_string = "";
+std::string revision_string = "";
+MessageQueue content_strings;
 
 // Func
 void clearScreenAndRepaint();
@@ -80,10 +86,10 @@ void initResource() {
     TTF_SetFontStyle(font_content, TTF_STYLE_BOLD);
 
     // Resource Implementation
-    s_bg = IMG_Load("./Graphics/amupdater_bg.tga");
+    s_bg = IMG_Load("./AMUpdaterData/Graphics/amupdater_bg.tga");
     t_bg = SDL_CreateTextureFromSurface(renderer, s_bg);
 
-    t_window = IMG_LoadTexture(renderer, "./Graphics/amupdater_window.tga");
+    t_window = IMG_LoadTexture(renderer, "./AMUpdaterData/Graphics/amupdater_window.tga");
     SDL_GetTextureSize(t_window, &w_window, &h_window);
     r_window = {
         (screen_x - w_window) / 2.0f,
@@ -92,26 +98,26 @@ void initResource() {
         h_window
     };
 
-    t_logo = IMG_LoadTexture(renderer, "./Graphics/amupdater_banner.tga");
+    t_logo = IMG_LoadTexture(renderer, "./AMUpdaterData/Graphics/amupdater_banner.tga");
     SDL_GetTextureSize(t_logo, &w_logo, &h_logo);
     r_logo = { 506, 166, w_logo, h_logo };
 
-    t_l_loading = IMG_LoadTexture(renderer, "./Graphics/amupdater_loading_l.tga");
+    t_l_loading = IMG_LoadTexture(renderer, "./AMUpdaterData/Graphics/amupdater_loading_l.tga");
     SDL_GetTextureSize(t_l_loading, &w_l_loading, &h_l_loading);
     r_l_loading = { 375, 410, w_l_loading, h_l_loading };
 
-    t_r_loading = IMG_LoadTexture(renderer, "./Graphics/amupdater_loading_r.tga");
+    t_r_loading = IMG_LoadTexture(renderer, "./AMUpdaterData/Graphics/amupdater_loading_r.tga");
     SDL_GetTextureSize(t_r_loading, &w_r_loading, &h_r_loading);
     r_r_loading = { 930, 410, w_r_loading, h_r_loading };
 
-    t_lbar = IMG_LoadTexture(renderer, "./Graphics/amupdater_pbar_s.tga");
+    t_lbar = IMG_LoadTexture(renderer, "./AMUpdaterData/Graphics/amupdater_pbar_s.tga");
     SDL_GetTextureSize(t_lbar, &w_lbar, &h_lbar);
     r_lbar = { 433, 432, w_lbar, h_lbar };
 
-    t_cbar = IMG_LoadTexture(renderer, "./Graphics/amupdater_pbar_c.tga");
+    t_cbar = IMG_LoadTexture(renderer, "./AMUpdaterData/Graphics/amupdater_pbar_c.tga");
     SDL_GetTextureSize(t_cbar, &w_cbar, &h_cbar);
 
-    t_rbar = IMG_LoadTexture(renderer, "./Graphics/amupdater_pbar_e.tga");
+    t_rbar = IMG_LoadTexture(renderer, "./AMUpdaterData/Graphics/amupdater_pbar_e.tga");
     SDL_GetTextureSize(t_rbar, &w_rbar, &h_rbar);
 
     clearScreenAndRepaint();
@@ -146,20 +152,31 @@ void renderText() {
     SDL_FRect r_rt = { (screen_x - w_rt) / 2.0f ,303,w_rt + 5,h_rt };
     SDL_RenderTexture(renderer, t_revisionText, nullptr, &r_rt);
 
-    SDL_Surface* s_contentText = TTF_RenderText_Blended(font_content, content_string.c_str(), content_string.length(), font_color);
-    SDL_Texture* t_contentText = SDL_CreateTextureFromSurface(renderer, s_contentText);
-    float w_ct, h_ct;
-    SDL_GetTextureSize(t_contentText, &w_ct, &h_ct);
-    SDL_FRect r_ct = { 402 , 469 ,w_ct + 3,h_ct };
-    SDL_RenderTexture(renderer, t_contentText, nullptr, &r_ct);
+    // Vector
+    auto stringVector = content_strings.getAllMessagesAsVector();
+
+    int idx = 0;
+    for (auto& msg : stringVector) {
+
+        if (msg.length() > 93) msg = msg.substr(0, 93) + " ...";
+
+        SDL_Surface* s_contentText = TTF_RenderText_Blended(font_content, msg.c_str(), msg.length(), font_color);
+        SDL_Texture* t_contentText = SDL_CreateTextureFromSurface(renderer, s_contentText);
+        float w_ct, h_ct;
+        SDL_GetTextureSize(t_contentText, &w_ct, &h_ct);
+        SDL_FRect r_ct = { 402 , 467 + h_ct*idx ,w_ct + 3,h_ct };
+        SDL_RenderTexture(renderer, t_contentText, nullptr, &r_ct);
+        idx++;
+        SDL_DestroyTexture(t_contentText);
+        SDL_DestroySurface(s_contentText);
+    }
 
     // Prevent Memeory Leak
     SDL_DestroyTexture(t_titleText);
     SDL_DestroyTexture(t_revisionText);
     SDL_DestroySurface(s_titleText);
     SDL_DestroySurface(s_revisionText);
-    SDL_DestroyTexture(t_contentText);
-    SDL_DestroySurface(s_contentText);
+
 }
 
 static int loadingThreadFunction(void* data) {
@@ -184,7 +201,7 @@ void renderLoading() {
     SDL_RenderTextureRotated(renderer, t_r_loading, nullptr, &r_r_loading, current_angle, nullptr, SDL_FLIP_NONE);
 }
 
-void renderProgressBar(int precentage) {
+void renderProgressBar() {
 
     // 渲染进度条中间部分
     if (precentage > 0) {

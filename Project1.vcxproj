@@ -141,6 +141,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AMConfig.hpp" />
+    <ClInclude Include="message_box.hpp" />
     <ClInclude Include="message_queue.hpp" />
     <ClInclude Include="resource.hpp" />
   </ItemGroup>

@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <vector>
 
-#define MAX_SIZE 11
+#define MAX_SIZE 10
 
 class MessageQueue {
 private:

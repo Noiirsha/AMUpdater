@@ -1,40 +1,55 @@
+#pragma once
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include "resource.hpp"
 #include "message_queue.hpp"
+#include "AMConfig.hpp"
+
+// test func
+void inputThreadFunc() {
+    std::string userInput;
+    while (true) {
+        std::cout << "Please enter the message u want to send to amupdater" << std::endl;
+        std::getline(std::cin, userInput);
+        content_strings.push(userInput);
+    }
+}
 
 int main(int argc, char* argv[]) {
+    /*
+        Config Init
+    */
+    AMConfig_Init();
+    title_string = AMConfig_GetGameTitle();
+    revision_string = "REV " + AMConfig_GetRevision();
+
+    /*
+        Graphics Init
+    */
     SDL_Init(SDL_INIT_VIDEO);
 
     // Init
-    window = SDL_CreateWindow("Updater", screen_x, screen_y, SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow("Updater", screen_x, screen_y, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP);
     renderer = SDL_CreateRenderer(window, nullptr);
     TTF_Init();
 
     initResource();
 
-    MessageQueue queue;
-    queue.push("System Initialization .......");
-    queue.push("    Get Hops               : Completed");
-    queue.push("    Router name resolution : Completed");
-    queue.push("    Server name resolution : Completed");
-    queue.push("    System setup           : In progress");
-    queue.push("    AMauthd services       : Not Connected");
+    // Debug: Test For Message Queue
+    std::thread inputThread(inputThreadFunc);
+    inputThread.detach();
 
-    auto msgVector = queue.getAllMessagesAsVector();
+    auto msgVector = content_strings.getAllMessagesAsVector();
     for (const auto& msg : msgVector) {
         std::cout << msg << std::endl;
     }
 
-
-    int precentage = 0;
     while (true) {
 
         clearScreenAndRepaint();
-
-        if (precentage < 100) precentage++;
-        renderProgressBar(precentage);
+        renderProgressBar();
 
         SDL_Delay(16);
         SDL_RenderPresent(renderer);
