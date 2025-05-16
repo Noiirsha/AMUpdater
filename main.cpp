@@ -15,6 +15,7 @@
 #include "message_queue.hpp"
 #include "AMConfig.hpp"
 #include "updater_network.hpp"
+#include "curl_helper.hpp"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -35,6 +36,9 @@ void startUpdateFunc() {
 }
 
 int main(int argc, char* argv[]) {
+
+    initCurl();
+
     /*
         Config Init and Network Init
     */
@@ -42,7 +46,7 @@ int main(int argc, char* argv[]) {
     title_string = AMConfig_GetGameTitle();
     revision_string = "REV " + AMConfig_GetRevision();
 
-    updateNetwork.init(AMConfig_GetServer(), AMConfig_GetNetId(), AMConfig_GetSerial(), AMConfig_GetCountdown());
+    updateNetwork.init(AMConfig_GetServer(), AMConfig_GetNetId(), AMConfig_GetSerial(), AMConfig_GetGameCD(), AMConfig_GetRevision(), AMConfig_GetCountdown());
 
     /*
         Graphics Init

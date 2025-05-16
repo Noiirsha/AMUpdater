@@ -80,7 +80,7 @@ bool isUrlReachable(const std::wstring& url) {
 
         if (!WinHttpReceiveResponse(hRequest, NULL)) {
             DWORD error = GetLastError();
-            std::wcerr << L"WinHttpReceiveResponse failed, error: " << error << std::endl;
+            std::wcerr << L"[ NET ]WinHttpReceiveResponse failed, error: " << error << std::endl;
             if (error == 12152) return true;
             return false;
         }

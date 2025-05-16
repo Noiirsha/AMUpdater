@@ -202,11 +202,10 @@ void renderLoading() {
 
 void renderProgressBar() {
 
-    // 渲染进度条中间部分
     if (precentage > 0) {
         SDL_RenderTexture(renderer, t_lbar, nullptr, &r_lbar);
 
-        float progress_width = w_cbar * (precentage / 100.0f) * 61.5f; // 使用浮点数除法
+        float progress_width = w_cbar * (precentage / 100.0f) * 61.5f;
         SDL_FRect r_cbar = {
             438,
             432,

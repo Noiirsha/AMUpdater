@@ -38,5 +38,8 @@
     <ClInclude Include="utils.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="curl_helper.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

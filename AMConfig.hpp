@@ -54,7 +54,7 @@ int AMConfig_GetCountdown() {
 	AMConfigDebugStringA(countdown_time);
 #endif // _DEBUG
 
-	return std::stod(countdown_time);
+	return std::stoi(countdown_time);
 }
 
 std::string AMConfig_GetGameTitle() {
@@ -66,6 +66,17 @@ std::string AMConfig_GetGameTitle() {
 #endif // _DEBUG
 
 	return title;
+}
+
+std::string AMConfig_GetGameCD() {
+
+	const char* game_cd = AMConfig.GetValue("MuchaCAConfig", "cacfg-game_cd", "");
+
+#ifdef _DEBUG
+	AMConfigDebugStringA(game_cd);
+#endif // _DEBUG
+
+	return game_cd;
 }
 
 std::string AMConfig_GetNetId() {
