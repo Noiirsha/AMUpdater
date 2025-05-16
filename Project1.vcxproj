@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClInclude Include="AMConfig.hpp" />
     <ClInclude Include="curl_helper.hpp" />
+    <ClInclude Include="extractor.hpp" />
     <ClInclude Include="message_box.hpp" />
     <ClInclude Include="message_queue.hpp" />
     <ClInclude Include="renderer.hpp" />

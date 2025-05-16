@@ -135,3 +135,25 @@ std::string AMConfig_GetSerial() {
 
 	return serial;
 }
+
+void AMConfig_WriteRevision(std::string targetRev) {
+
+	// 0 1 2 3 4 5 6 7
+	//   X . X X . X X
+	std::string game_rev = targetRev.substr(0, 1);
+	std::string game_ver = targetRev.substr(2, targetRev.size() - 1);
+
+	SI_Error rc1 = AMConfig.SetValue("AMUpdaterConfig", "amucfg-game_rev", game_rev.c_str());
+	if (rc1 < 0)
+		AMConfigDebugStringA("Warning: Cannot update Revision 1");
+
+	SI_Error rc2 = AMConfig.SetValue("MuchaCAConfig", "cacfg-game_ver", game_ver.c_str());
+	if (rc2 < 0)
+		AMConfigDebugStringA("Warning: Cannot update Revision 2");
+
+	SI_Error rc3 = AMConfig.SaveFile("AMConfig.ini");
+	if (rc3 < 0)
+		AMConfigDebugStringA("Warning: Cannot save file");
+
+	return;
+}

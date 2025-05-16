@@ -52,10 +52,35 @@ static size_t WriteFileCallback(void* ptr, size_t size, size_t nmemb, FILE* stre
     return fwrite(ptr, size, nmemb, stream);
 }
 
+struct progress {
+    char* p;
+    size_t size;
+};
+
+int progress_callback(void* clientp,
+    double dltotal,
+    double dlnow,
+    double ultotal,
+    double ulnow) {
+
+    struct progress* memory = (struct progress*) clientp;
+
+    if (dlnow > 0)
+    {
+        int downloadPrecentage = (dlnow / dltotal * 100);
+        precentage = downloadPrecentage * 0.7;
+        content_strings.overwriteLatest(outputNetworkStringA("File Download", std::to_string(downloadPrecentage) + "% (" + std::to_string(dlnow) + " / " + std::to_string(dltotal) + ")"));
+
+        CurlDebugStringA("Download Progress: " + std::to_string(downloadPrecentage) + "% (" + std::to_string(dlnow) + " / " + std::to_string(dltotal) + ")");
+    }
+
+    return 0;
+}
+
 int Curl_GetFile(std::string url, std::string filePath) {
 
     if (curl) {
-
+        struct progress data;
         content_strings.push(outputNetworkStringA("File Download", ""));
 
         FILE* file = fopen(filePath.c_str(), "wb");
@@ -65,7 +90,12 @@ int Curl_GetFile(std::string url, std::string filePath) {
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteFileCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);                 
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);          
+
+        curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, &data);
+        curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+        
 
         CURLcode res = curl_easy_perform(curl);
 
@@ -78,20 +108,6 @@ int Curl_GetFile(std::string url, std::string filePath) {
             curl_easy_cleanup(curl);
             return -1;
         }
-
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-        curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, [](void*, double dlTotal, double dlNow, double, double) {
-            if (dlTotal > 0) {
-
-                int downloadPrecentage = (dlNow / dlTotal * 100);
-                precentage = downloadPrecentage;
-                content_strings.overwriteLatest(outputNetworkStringA("File Download", std::to_string(downloadPrecentage) + "% (" + std::to_string(dlNow) + " / " + std::to_string(dlTotal) + ")"));
-
-                CurlDebugStringA("Download Progress: " + downloadPrecentage);
-
-            }
-            return 0;
-        });
 
         fclose(file);
 

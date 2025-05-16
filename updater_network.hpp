@@ -12,6 +12,7 @@
 #include "message_queue.hpp"
 #include "utils.hpp"
 #include "curl_helper.hpp"
+#include "extractor.hpp"
 
 #pragma comment(lib, "wininet.lib")
 
@@ -99,6 +100,8 @@ private:
 	std::string game_cd;
 	std::string dl_image_path;
 	int countdown;
+
+	std::string target_rev;
 
 	/*
 		Implements
@@ -247,6 +250,24 @@ private:
 		
 		if (downloadStatus == 0) { // Download Success
 			// DO Extract
+
+			content_strings.push(outputNetworkStringA("File Export", "In Progress"));
+			if (extractDlImage(dl_image_path, "../") == 0) {
+				precentage = 100;
+				content_strings.overwriteLatest(outputNetworkStringA("File Export", "SUCCESS"));
+
+				// Update Config
+				revision_string = "REV " + target_rev;
+				AMConfig_WriteRevision(target_rev);
+
+			}
+			else {
+				content_strings.overwriteLatest(outputNetworkStringA("File Export", "FAILURE"));
+				precentage = 0;
+				revision_string = "REV " + revision;
+				terminateErrorSession("Applying image failed");
+			}
+
 			terminateSuccessSession("");
 		}
 		else { // Download Failed
@@ -286,7 +307,9 @@ private:
 					std::string targetMD5 = GetFileMD5(path + fileName);
 
 					if (targetMD5 == "FileError") {
-						terminateErrorSession("File import failed");
+						content_strings.push("Error (File import failed)");
+						content_strings.push("Reacquiring file .....");
+						processUpdate();
 						return;
 					}
 
@@ -339,6 +362,7 @@ private:
 				std::string revisionFromServer;
 				if (j.contains("revision")) {
 					revisionFromServer = j["revision"];
+					this->target_rev = revisionFromServer;
 				}
 
 				if (revisionFromServer == revision) {
