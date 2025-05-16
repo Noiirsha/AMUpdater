@@ -20,9 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="message_queue.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -30,6 +27,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="message_box.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="updater_network.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -146,6 +146,7 @@
     <ClInclude Include="message_queue.hpp" />
     <ClInclude Include="renderer.hpp" />
     <ClInclude Include="updater_network.hpp" />
+    <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

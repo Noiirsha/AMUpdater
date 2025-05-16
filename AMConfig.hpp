@@ -37,7 +37,7 @@ std::string AMConfig_GetRevision() {
 
 std::string AMConfig_GetServer() {
 
-	const char* auth_server_url = AMConfig.GetValue("MuchaCAConfig", "cacfg-auth_server_url", "http://error/");
+	const char* auth_server_url = AMConfig.GetValue("MuchaCAConfig", "cacfg-auth_server_url", "error");
 
 #ifdef _DEBUG
 	AMConfigDebugStringA(auth_server_url);
