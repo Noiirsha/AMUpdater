@@ -1,38 +1,19 @@
-# 自定义AMUpdater
+# Custom AMUpdater
 
 ![image](https://github.com/user-attachments/assets/8c0d3c7f-65fd-4187-b8d0-652f7b240a4c)
 
 
->  (本意只是给湾岸写的 用来更新下活动信息文件)
+>  *(Originally, this was just written for the MAXIMUM TUNE series to update the event files.)*
 >
-> 这东西跟原版AMUpdater半毛钱关系也没有 也不会实际跟AMAuthd进行通信（比如让服务器显示最新修订版）
+> *This thing has absolutely nothing to do with the original AMUpdater and doesn’t actually communicate with AMAuthd (e.g., to make the server display the latest revision).*
 >
-> 原版用的dx9实现的 我用的SDL3
+> *Haven’t written C++ in years, so forgive my  very shitty code.*
 >
-> n年没写C++了 原谅我的史山代码
->
-> 以及你懂的 我强制禁用了SSL检查
+> *btw I forcibly disabled SSL verification.*
 
-## 使用方法
+## Requests from this updater
 
-连库带包丢进去AMCUS文件夹，这个AMUpdater会自动读取AMConfig来确定以下信息
-
-```text
-cacfg-auth_server_url       更新服务器URL         
-cacfg-game_cd               游戏版本信息          
-amucfg-title                游戏名                
-amucfg-game_rev             大版本号			  
-cacfg-game_ver              小版本号			  
-amucfg-countdown            关闭倒计时			  
-amdcfg-writableConfig       WritableConfig路径 	  
-dtcfg-dl_image_path         镜像下载地址		
-```
-
-## 请求连接说明
-
-1. ### `GET /updater_poweron`
-
- 获取服务器存活情况
+### 1. `GET /updater_poweron`
 
 ```json
 {
@@ -42,8 +23,6 @@ dtcfg-dl_image_path         镜像下载地址
 
 ### 2. `GET /updater_getrevision`
 
-获取版本号
-
 ```json
 {
 	"revision": "X.XX.XX"
@@ -51,8 +30,6 @@ dtcfg-dl_image_path         镜像下载地址
 ```
 
 ### 3. `GET /updater_getfileinfo`
-
-获取需要校验的文件
 
 ```json
 "updateInfo": [
@@ -71,8 +48,6 @@ dtcfg-dl_image_path         镜像下载地址
 
 ### 4. `GET /updater_getfile`
 
-获取dl_image (格式为7z)
-
 ```
 Header:
 	Content-Length: 10240000
@@ -80,3 +55,4 @@ Header:
 *res.sendFile()*
 ```
 
+## *Change the include path in project setting with SDL3*
