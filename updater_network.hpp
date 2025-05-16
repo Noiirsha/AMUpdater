@@ -97,28 +97,16 @@ private:
 	std::string net_id;
 	std::string serial;
 	std::string game_cd;
+	std::string dl_image_path;
 	int countdown;
-
-	/*
-		Some utils
-	*/
-
-	std::string outputNetworkStringA(std::string content, std::string status) {
-
-		std::ostringstream oss;
-
-		oss << "  " << std::left << std::setw(40) << content;
-		std::string result = oss.str();
-
-		return result + " :  " + status;
-	}
 
 	/*
 		Implements
 	*/
 
 	void terminateSuccessSession(std::string message) {
-		content_strings.push(message);
+
+		if (!message.empty()) content_strings.push(message);
 		content_strings.push("Completed");
 
 		int time = countdown;
@@ -247,13 +235,99 @@ private:
 		}
 	}
 
+	void processUpdate() {
+
+		std::string requestPath = "updater_getfile";
+		int downloadStatus = Curl_GetFile((server_url + requestPath + "?"
+			+ "game_cd=" + game_cd + "&"
+			+ "net_id=" + net_id + "&"
+			+ "serial=" + serial),
+			dl_image_path
+		);
+		
+		if (downloadStatus == 0) { // Download Success
+			// DO Extract
+			terminateSuccessSession("");
+		}
+		else { // Download Failed
+			terminateErrorSession("File download Error");
+		}
+
+	}
+
+	void checkFileIntegrity() {
+
+		std::string requestPath = "updater_getfileinfo";
+		std::string responseData = Curl_Get(server_url + requestPath + "?" 
+			+ "game_cd=" + game_cd + "&"
+			+ "net_id=" + net_id + "&"
+			+ "serial=" + serial
+		);
+
+		if (!responseData.empty()) {
+
+			try {
+
+				// is file broken
+				bool flag = true;
+
+				json j = json::parse(responseData);
+				NetworkDebugStringA(j.dump(4));
+				
+				auto updateInfo = j["updateInfo"];
+
+				for (const auto& item : updateInfo) {
+
+					std::string path = item["path"];
+					std::string fileName = item["fileName"];
+					std::string md5 = item["md5"];
+
+					// Check MD5
+					std::string targetMD5 = GetFileMD5(path + fileName);
+
+					if (targetMD5 == "FileError") {
+						terminateErrorSession("File import failed");
+						return;
+					}
+
+					NetworkDebugStringA("Local File MD5: " + targetMD5);
+					if (targetMD5 != md5) {
+						NetworkDebugStringA("MD5 Check Failed: " + path + fileName);
+						flag = false;
+						break;
+					}
+
+				}
+
+				// file is broken
+				if (!flag) {
+					content_strings.push("File broken, starting download .....");
+					processUpdate();
+				}
+				else {
+					terminateSuccessSession("");
+				}
+
+			}
+			catch (const json::parse_error& e) {
+				NetworkDebugStringA("JSON parse error");
+				terminateErrorSession("System parser Error");
+			}
+
+		}
+		else {
+			terminateSuccessSession("");
+		}
+
+	}
+
 	void checkIsUpdateAvail() {
 
 		content_strings.push("Checking Update .....");
 
 		// Send request should contains mucha_front
 		std::string requestPath = "updater_getrevision";
-		std::string responseData = Curl_Get(server_url + requestPath);
+		std::string responseData = Curl_Get(server_url + requestPath + "?" + "game_cd=" + game_cd);
 
 		if (!responseData.empty()) {
 
@@ -269,10 +343,12 @@ private:
 
 				if (revisionFromServer == revision) {
 					content_strings.overwriteLatest("Update Not Avaliable");
+					checkFileIntegrity();
 				}
 				else {
 					revision_string = "REV " + revision + " => " + "REV " + revisionFromServer;
 					content_strings.overwriteLatest("Starting Update .....");
+					processUpdate();
 				}
 
 			}
@@ -293,12 +369,13 @@ private:
 
 public:
 
-	void init(std::string a1, std::string a2, std::string a3, std::string a4, std::string a5, int countdown) {
+	void init(std::string a1, std::string a2, std::string a3, std::string a4, std::string a5, std::string a6, int countdown) {
 		this->server_url = a1;
 		this->net_id = a2;
 		this->serial = a3;
 		this->game_cd = a4;
 		this->revision = a5;
+		this->dl_image_path = a6;
 		this->countdown = countdown;
 		content_strings.push("Starting Initialization .....");
 	}

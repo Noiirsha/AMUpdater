@@ -4,7 +4,12 @@
 #include <string>
 #include <tlhelp32.h>
 #include <tchar.h>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+#include <openssl/md5.h>
 
+#pragma warning(disable : 4996)
 #pragma comment(lib, "winhttp.lib")
 
 LPCWSTR string2LPCWSTR(std::string str)
@@ -119,4 +124,45 @@ bool IsProcessRunning(const TCHAR* processName) {
 
     CloseHandle(snapshot);
     return exists;
+}
+
+std::string GetFileMD5(std::string filename) {
+    std::ifstream file(filename, std::ios::binary);
+    if (!file) {
+        std::cerr << "Cannot open file: " << filename << std::endl;
+        return "FileError";
+    }
+
+    MD5_CTX md5Context;
+    MD5_Init(&md5Context);
+
+    char buffer[1024];
+    while (file.read(buffer, sizeof(buffer)) || file.gcount()) {
+        MD5_Update(&md5Context, buffer, file.gcount());
+    }
+
+    unsigned char result[MD5_DIGEST_LENGTH];
+    MD5_Final(result, &md5Context);
+
+    std::stringstream md5string;
+    md5string << std::hex << std::setfill('0');
+    for (const auto& byte : result) {
+        md5string << std::setw(2) << (int)byte;
+    }
+
+    return md5string.str();
+}
+
+/*
+    OutputLog Utils
+*/
+
+std::string outputNetworkStringA(std::string content, std::string status) {
+
+    std::ostringstream oss;
+
+    oss << "  " << std::left << std::setw(40) << content;
+    std::string result = oss.str();
+
+    return result + " :  " + status;
 }

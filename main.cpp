@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
     title_string = AMConfig_GetGameTitle();
     revision_string = "REV " + AMConfig_GetRevision();
 
-    updateNetwork.init(AMConfig_GetServer(), AMConfig_GetNetId(), AMConfig_GetSerial(), AMConfig_GetGameCD(), AMConfig_GetRevision(), AMConfig_GetCountdown());
+    updateNetwork.init(AMConfig_GetServer(), AMConfig_GetNetId(), AMConfig_GetSerial(), AMConfig_GetGameCD(), AMConfig_GetRevision(), AMConfig_GetDlImagePath(), AMConfig_GetCountdown());
 
     /*
         Graphics Init

@@ -79,6 +79,23 @@ std::string AMConfig_GetGameCD() {
 	return game_cd;
 }
 
+std::string AMConfig_GetDlImagePath() {
+
+	const char* downloadPath = AMConfig.GetValue("MuchaDtConfig", "dtcfg-dl_image_path", "./");
+
+	std::string result = downloadPath;
+
+	for (auto& c : result) {
+		if (c == '\\') c = '/';
+	}
+
+#ifdef _DEBUG
+	AMConfigDebugStringA(result);
+#endif // _DEBUG
+
+	return result;
+}
+
 std::string AMConfig_GetNetId() {
 
 	CSimpleIniA WritableConfig;
