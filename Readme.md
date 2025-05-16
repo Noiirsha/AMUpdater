@@ -1,5 +1,8 @@
 # 自定义AMUpdater
 
+![image](https://github.com/user-attachments/assets/8c0d3c7f-65fd-4187-b8d0-652f7b240a4c)
+
+
 >  (本意只是给湾岸写的 用来更新下活动信息文件)
 >
 > 这东西跟原版AMUpdater半毛钱关系也没有 也不会实际跟AMAuthd进行通信（比如让服务器显示最新修订版）
