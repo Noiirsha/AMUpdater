@@ -15,14 +15,14 @@
 连库带包丢进去AMCUS文件夹，这个AMUpdater会自动读取AMConfig来确定以下信息
 
 ```text
-更新服务器URL           cacfg-auth_server_url
-游戏版本信息            cacfg-game_cd
-游戏名                 amucfg-title
-大版本号			   amucfg-game_rev
-小版本号			   cacfg-game_ver
-关闭倒计时			    amucfg-countdown
-WritableConfig路径 	   amdcfg-writableConfig
-镜像下载地址			dtcfg-dl_image_path
+cacfg-auth_server_url       更新服务器URL         
+cacfg-game_cd               游戏版本信息          
+amucfg-title                游戏名                
+amucfg-game_rev             大版本号			  
+cacfg-game_ver              小版本号			  
+amucfg-countdown            关闭倒计时			  
+amdcfg-writableConfig       WritableConfig路径 	  
+dtcfg-dl_image_path         镜像下载地址		
 ```
 
 ## 请求连接说明
