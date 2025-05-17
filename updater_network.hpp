@@ -189,10 +189,11 @@ private:
 
 		content_strings.push(outputNetworkStringA("ALL.Net Authentication", "In Progress"));
 
-		bool isAMAuthdRunning = IsProcessRunning(_T("amauthd.exe"));
-		bool isMuchaCDRunning = IsProcessRunning(_T("muchacd.exe"));
+		bool isAMAuthdExist = std::filesystem::exists("./AMAuthd.exe");
+		bool isIAuthDllExist = std::filesystem::exists("./iauthdll.dll");
+		bool isMuchaCDExist = std::filesystem::exists("./MuchaBin/muchacd.exe");
 
-		if (!(isAMAuthdRunning && isMuchaCDRunning)) {
+		if (!(isAMAuthdExist && isIAuthDllExist && isMuchaCDExist)) {
 			content_strings.overwriteLatest(outputNetworkStringA("ALL.Net Authentication", "FAILURE"));
 			terminateErrorSession("AMAuthd disconnected");
 		}
