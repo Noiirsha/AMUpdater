@@ -12,7 +12,7 @@
     For Progress bar usage
     Used if network is required to download the latest data
 */
-int precentage = 0;
+double precentage = 0.00f;
 
 // Resources
 SDL_Window* window;

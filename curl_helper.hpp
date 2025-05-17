@@ -67,9 +67,9 @@ int progress_callback(void* clientp,
 
     if (dlnow > 0)
     {
-        int downloadPrecentage = (dlnow / dltotal * 100);
-        precentage = downloadPrecentage * 0.7;
-        content_strings.overwriteLatest(outputNetworkStringA("File Download", std::to_string(downloadPrecentage) + "%"));
+        double downloadPrecentage = (dlnow / dltotal * 100.0f);
+        precentage = downloadPrecentage * 0.7f;
+        content_strings.overwriteLatest(outputNetworkStringA("File Download", std::to_string((int)downloadPrecentage) + "%"));
 
         CurlDebugStringA("Download Progress: " + std::to_string(downloadPrecentage) + "% (" + std::to_string(dlnow) + " / " + std::to_string(dltotal) + ")");
     }
