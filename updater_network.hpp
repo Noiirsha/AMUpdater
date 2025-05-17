@@ -385,8 +385,8 @@ private:
 
 		}
 		else {
-			content_strings.overwriteLatest(outputNetworkStringA("Updater Authentication", "FAILURE"));
-			terminateErrorSession("Updater Authentication communication Error");
+			content_strings.overwriteLatest("Update Not Avaliable");
+			terminateErrorSession("Updater Authentication Server Response Error");
 		}
 
 
