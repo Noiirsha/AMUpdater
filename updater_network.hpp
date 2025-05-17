@@ -121,6 +121,10 @@ private:
 			Sleep(1000);
 		}
 
+		if ((int)precentage == 100) {
+			exit(1024); // Updater Success to update file, require to reboot amauthd and so on
+		}
+
 		exit(0);
 	}
 
