@@ -24,6 +24,7 @@ Compile the file, link the libs, and place it into `AMCUS` folder, the program w
 `https://v388-front.mucha-prd.nbgi-amnet.jp:10082/mucha/front/updater_poweron`) 
 
 `dl_image`: 7z file without extension. the file will be extract to the upper folder(`../AMCUS` = `Game Folder`)
+it's used by `GET /updater_getfile`, which can receive the update file from the server
 
 the file directory of `sendFileToClient.7z (dl_image)` should like this:
 
