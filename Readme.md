@@ -5,11 +5,40 @@
 
 >  *(Originally, this was just written for the MAXIMUM TUNE series to update the event files.)*
 >
-> *This thing has absolutely nothing to do with the original AMUpdater and doesn’t actually communicate with AMAuthd (e.g., to make the server display the latest revision).*
+>  *This thing has absolutely nothing to do with the original AMUpdater and doesn’t actually communicate with AMAuthd (e.g., to make the server display the latest revision).*
 >
-> *Haven’t written C++ in years, so forgive my  very shitty code.*
+>  *Haven’t written C++ in years, so forgive my  very shitty code.*
 >
-> *btw I forcibly disabled SSL verification.*
+>  *btw I forcibly disabled SSL verification.*
+
+
+
+## How to use?
+
+Compile the file, link the libs, and place it into `AMCUS` folder, the program will read `AMConfig.ini` as its config file.
+
+`cacfg-auth_server_url` will be used as start of actual request url
+
+(e.g. `https://v388-front.mucha-prd.nbgi-amnet.jp:10082/mucha/front/`, the request will send to server like this
+
+`https://v388-front.mucha-prd.nbgi-amnet.jp:10082/mucha/front/updater_poweron`) 
+
+`dl_image`: 7z file without extension. the file will be extract to the upper folder(`../AMCUS` = `Game Folder`)
+it's used by `GET /updater_getfile`, which can receive the update file from the server
+
+the file directory of `sendFileToClient.7z (dl_image)` should like this:
+
+```
+the file structure of sendFileToClient.7z:
+|- data_jp
+	|- menu
+		|-Zenichi
+			|- ZenichiConfig.lua
+|- data
+	|- ...
+```
+
+
 
 ## Requests from this updater
 
@@ -50,9 +79,14 @@
 
 ```
 Header:
-	Content-Length: 10240000
+	Content-Length: your_file_size
 
 *res.sendFile()*
 ```
 
 ## *Change the include path in project setting with SDL3*
+
+*lib used in the project*: `libcurl`, `7z`, `SDL3`
+
+
+
