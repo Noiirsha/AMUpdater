@@ -196,8 +196,9 @@ private:
 		bool isAMAuthdExist = std::filesystem::exists("./AMAuthd.exe");
 		bool isIAuthDllExist = std::filesystem::exists("./iauthdll.dll");
 		bool isMuchaCDExist = std::filesystem::exists("./MuchaBin/muchacd.exe");
+		bool isRunning = IsProcessRunning(L"AMAuthd.exe") && IsProcessRunning(L"muchacd.exe");
 
-		if (!(isAMAuthdExist && isIAuthDllExist && isMuchaCDExist)) {
+		if (!(isAMAuthdExist && isIAuthDllExist && isMuchaCDExist && isRunning)) {
 			content_strings.overwriteLatest(outputNetworkStringA("ALL.Net Authentication", "FAILURE"));
 			terminateErrorSession("AMAuthd disconnected");
 		}
