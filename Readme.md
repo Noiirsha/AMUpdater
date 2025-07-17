@@ -1,6 +1,7 @@
 # Custom AMUpdater
 
-![image](https://github.com/user-attachments/assets/8c0d3c7f-65fd-4187-b8d0-652f7b240a4c)
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/316053b7-ac96-423c-b72d-c6a873f28946" />
+
 
 
 >  *(Originally, this was just written for the MAXIMUM TUNE series to update the event files.)*
