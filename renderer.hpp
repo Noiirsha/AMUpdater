@@ -4,6 +4,7 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include "message_queue.hpp"
+#include <format>
 
 #define screen_x 1366
 #define screen_y 768
@@ -13,6 +14,9 @@
     Used if network is required to download the latest data
 */
 double precentage = 0.00f;
+double fileDownloadPrecentage = 0.00f;
+double fileDownloadedSize = 0.00f;
+double fileTotalSize = 0.00f;
 
 // Resources
 SDL_Window* window;
@@ -62,7 +66,10 @@ SDL_Mutex* rotation_mutex = nullptr;
 // TTF
 TTF_Font* font_title;
 TTF_Font* font_content;
-SDL_Color font_color = { 0xff,0xff,0xff,0xff };
+TTF_Font* font_downloadProgress;
+SDL_Color font_color_white = { 0xff,0xff,0xff,0xff };
+SDL_Color font_color_red = { 0xff,0x00,0x00,0xff };
+SDL_Color font_color_black = { 0x00,0x00,0x00,0xff };
 std::string title_string = "";
 std::string revision_string = "";
 
@@ -71,6 +78,7 @@ void clearScreenAndRepaint();
 static int loadingThreadFunction(void* data);
 void renderLoading();
 void renderText();
+void renderDownloadText();
 
 void initResource() {
 
@@ -79,10 +87,12 @@ void initResource() {
     loading_thread = SDL_CreateThread(loadingThreadFunction, "LoadingThread", NULL);
 
     // Font
-    font_title = TTF_OpenFont("C:/Windows/Fonts/tahoma.ttf", 19);
-    font_content = TTF_OpenFont("C:/Windows/Fonts/tahoma.ttf", 11);
+    font_title = TTF_OpenFont("./msgothic.ttf", 19);
+    font_content = TTF_OpenFont("./msgothic.ttf", 11);
+    font_downloadProgress = TTF_OpenFont("./msgothic.ttf", 14);
     TTF_SetFontStyle(font_title, TTF_STYLE_BOLD);
     TTF_SetFontStyle(font_content, TTF_STYLE_BOLD);
+    TTF_SetFontStyle(font_downloadProgress, TTF_STYLE_NORMAL);
 
     // Resource Implementation
     s_bg = IMG_Load("./AMUpdaterData/Graphics/amupdater_bg.tga");
@@ -132,23 +142,65 @@ void clearScreenAndRepaint() {
 
     renderLoading();
     renderText();
+    renderDownloadText();
+}
 
+void renderDownloadText() {
+    if (precentage > 0) {
+        std::string warningTextLine1 = "!WARNING!";
+        std::string warningTextLine2 = "Do not shut down during Updating";
+        std::string downloadStatusText = std::format(
+            "Downloading : {:.1f} % [ {:.1f} KB / {:.1f} KB ] --:--:--",
+            fileDownloadPrecentage, fileDownloadedSize / 1024.0f , fileTotalSize / 1024.0f
+        );
+
+        SDL_Surface* s_warningText = TTF_RenderText_Blended(font_title, warningTextLine1.c_str(), warningTextLine1.length(), font_color_red);
+        SDL_Texture* t_warningText = SDL_CreateTextureFromSurface(renderer, s_warningText);
+        SDL_Surface* s_warningText2 = TTF_RenderText_Blended(font_title, warningTextLine2.c_str(), warningTextLine2.length(), font_color_red);
+        SDL_Texture* t_warningText2 = SDL_CreateTextureFromSurface(renderer, s_warningText2);
+
+        SDL_Surface* s_downloadProgress = TTF_RenderText_Blended(font_downloadProgress, downloadStatusText.c_str(), downloadStatusText.length(), font_color_black);
+        SDL_Texture* t_downloadProgress = SDL_CreateTextureFromSurface(renderer, s_downloadProgress);
+
+        float w_wt1, h_wt1, w_wt2, h_wt2, w_dt, h_dt ;
+
+        SDL_GetTextureSize(t_warningText, &w_wt1, &h_wt1);
+        SDL_FRect r_wt1 = { (screen_x - w_wt1) / 2.0f ,335,w_wt1 + 5,h_wt1 };
+        SDL_RenderTexture(renderer, t_warningText, nullptr, &r_wt1);
+        
+        SDL_GetTextureSize(t_warningText2, &w_wt2, &h_wt2);
+        SDL_FRect r_wt2 = { (screen_x - w_wt2) / 2.0f ,355,w_wt2 + 5,h_wt2 };
+        SDL_RenderTexture(renderer, t_warningText2, nullptr, &r_wt2);
+
+        SDL_GetTextureSize(t_downloadProgress, &w_dt, &h_dt);
+        SDL_FRect r_dt = { (screen_x - w_dt) / 2.0f ,408,w_dt + 5,h_dt };
+        SDL_RenderTexture(renderer, t_downloadProgress, nullptr, &r_dt);
+
+        SDL_DestroyTexture(t_warningText);
+        SDL_DestroySurface(s_warningText);
+
+        SDL_DestroyTexture(t_warningText2);
+        SDL_DestroySurface(s_warningText2);
+
+        SDL_DestroyTexture(t_downloadProgress);
+        SDL_DestroySurface(s_downloadProgress);
+    }
 }
 
 void renderText() {
-    SDL_Surface* s_titleText = TTF_RenderText_Blended(font_title, title_string.c_str(), title_string.length(), font_color);
-    SDL_Surface* s_revisionText = TTF_RenderText_Blended(font_title, revision_string.c_str(), revision_string.length(), font_color);
+    SDL_Surface* s_titleText = TTF_RenderText_Blended(font_title, title_string.c_str(), title_string.length(), font_color_white);
+    SDL_Surface* s_revisionText = TTF_RenderText_Blended(font_title, revision_string.c_str(), revision_string.length(), font_color_white);
     SDL_Texture* t_titleText = SDL_CreateTextureFromSurface(renderer, s_titleText);
     SDL_Texture* t_revisionText = SDL_CreateTextureFromSurface(renderer, s_revisionText);
     
     float w_tt, h_tt, w_rt, h_rt;
 
     SDL_GetTextureSize(t_titleText, &w_tt, &h_tt);
-    SDL_FRect r_tt = { (screen_x - w_tt)/2.0f ,282,w_tt + 5,h_tt };
+    SDL_FRect r_tt = { (screen_x - w_tt)/2.0f ,285,w_tt + 5,h_tt };
     SDL_RenderTexture(renderer, t_titleText, nullptr, &r_tt);
 
     SDL_GetTextureSize(t_revisionText, &w_rt, &h_rt);
-    SDL_FRect r_rt = { (screen_x - w_rt) / 2.0f ,303,w_rt + 5,h_rt };
+    SDL_FRect r_rt = { (screen_x - w_rt) / 2.0f ,307,w_rt + 5,h_rt };
     SDL_RenderTexture(renderer, t_revisionText, nullptr, &r_rt);
 
     // Vector
@@ -159,11 +211,11 @@ void renderText() {
 
         if (msg.length() > 93) msg = msg.substr(0, 93) + " ...";
 
-        SDL_Surface* s_contentText = TTF_RenderText_Blended(font_content, msg.c_str(), msg.length(), font_color);
+        SDL_Surface* s_contentText = TTF_RenderText_Blended(font_content, msg.c_str(), msg.length(), font_color_white);
         SDL_Texture* t_contentText = SDL_CreateTextureFromSurface(renderer, s_contentText);
         float w_ct, h_ct;
         SDL_GetTextureSize(t_contentText, &w_ct, &h_ct);
-        SDL_FRect r_ct = { 402 , 467 + h_ct*idx ,w_ct,h_ct };
+        SDL_FRect r_ct = { 402 , 472 + 12.0f*idx ,w_ct ,h_ct };
         SDL_RenderTexture(renderer, t_contentText, nullptr, &r_ct);
         idx++;
         SDL_DestroyTexture(t_contentText);

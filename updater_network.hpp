@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iostream>
 #include <iomanip>
@@ -376,7 +376,7 @@ private:
 					checkFileIntegrity();
 				}
 				else {
-					revision_string = "REV " + revision + " => " + "REV " + revisionFromServer;
+					revision_string = "REV " + revision + " -> " + "REV " + revisionFromServer;
 					content_strings.overwriteLatest("Starting Update .....");
 					processUpdate();
 				}

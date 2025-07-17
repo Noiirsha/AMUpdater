@@ -68,8 +68,11 @@ int progress_callback(void* clientp,
     if (dlnow > 0)
     {
         double downloadPrecentage = (dlnow / dltotal * 100.0f);
-        precentage = downloadPrecentage * 0.7f;
-        content_strings.overwriteLatest(outputNetworkStringA("File Download", std::to_string((int)downloadPrecentage) + "%"));
+        precentage = downloadPrecentage * 0.95f;
+        //content_strings.overwriteLatest(outputNetworkStringA("File Download", std::to_string((int)downloadPrecentage) + "%"));
+        fileDownloadPrecentage = downloadPrecentage;
+        fileDownloadedSize = dlnow;
+        fileTotalSize = dltotal;
 
         CurlDebugStringA("Download Progress: " + std::to_string(downloadPrecentage) + "% (" + std::to_string(dlnow) + " / " + std::to_string(dltotal) + ")");
     }
@@ -81,7 +84,8 @@ int Curl_GetFile(std::string url, std::string filePath) {
 
     if (curl) {
         struct progress data;
-        content_strings.push(outputNetworkStringA("File Download", ""));
+        content_strings.push(outputNetworkStringA("Checking Partition", "Completed"));
+        content_strings.push(outputNetworkStringA("File Download", "In Progress"));
 
         FILE* file = fopen(filePath.c_str(), "wb");
         if (!file) return -1;
