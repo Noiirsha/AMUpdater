@@ -106,24 +106,27 @@ bool isUrlReachable(const std::wstring& url) {
     return result;
 }
 
-bool IsProcessRunning(const TCHAR* processName) {
-    bool exists = false;
-    PROCESSENTRY32 entry;
-    entry.dwSize = sizeof(PROCESSENTRY32);
+bool IsProcessRunning(const std::string& processName) {
+    std::string command = "tasklist | findstr /I \"" + processName + "\"";
 
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+    FILE* pipe = _popen(command.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "Failed to run command.\n";
+        return false;
+    }
 
-    if (Process32First(snapshot, &entry)) {
-        while (Process32Next(snapshot, &entry)) {
-            if (_tcsicmp(entry.szExeFile, processName) == 0) {
-                exists = true;
-                break;
-            }
+    char buffer[512];
+    bool found = false;
+
+    while (fgets(buffer, sizeof(buffer), pipe)) {
+        if (strstr(buffer, processName.c_str())) {
+            found = true;
+            break;
         }
     }
 
-    CloseHandle(snapshot);
-    return exists;
+    _pclose(pipe);
+    return found;
 }
 
 std::string GetFileMD5(std::string filename) {

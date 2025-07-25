@@ -165,11 +165,11 @@ void renderDownloadText() {
         float w_wt1, h_wt1, w_wt2, h_wt2, w_dt, h_dt ;
 
         SDL_GetTextureSize(t_warningText, &w_wt1, &h_wt1);
-        SDL_FRect r_wt1 = { (screen_x - w_wt1) / 2.0f ,335,w_wt1 + 5,h_wt1 };
+        SDL_FRect r_wt1 = { (screen_x - w_wt1) / 2.0f ,340,w_wt1 + 5,h_wt1 };
         SDL_RenderTexture(renderer, t_warningText, nullptr, &r_wt1);
         
         SDL_GetTextureSize(t_warningText2, &w_wt2, &h_wt2);
-        SDL_FRect r_wt2 = { (screen_x - w_wt2) / 2.0f ,355,w_wt2 + 5,h_wt2 };
+        SDL_FRect r_wt2 = { (screen_x - w_wt2) / 2.0f ,360,w_wt2 + 5,h_wt2 };
         SDL_RenderTexture(renderer, t_warningText2, nullptr, &r_wt2);
 
         SDL_GetTextureSize(t_downloadProgress, &w_dt, &h_dt);
