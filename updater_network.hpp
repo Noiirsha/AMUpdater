@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <iostream>
 #include <iomanip>
@@ -102,6 +102,7 @@ private:
 	int countdown;
 
 	std::string target_rev;
+	std::string external_update_url;
 
 	/*
 		Implements
@@ -212,10 +213,10 @@ private:
 		content_strings.push(outputNetworkStringA("Updater Authentication", "In Progress"));
 
 		// Im decide to use curl here
-		
+
 		// Send request should contains mucha_front
 		std::string requestPath = "updater_poweron";
-		
+
 		std::string responseData = Curl_Get(server_url + requestPath);
 
 		if (!responseData.empty()) {
@@ -246,14 +247,19 @@ private:
 
 	void processUpdate() {
 
-		std::string requestPath = "updater_getfile";
-		int downloadStatus = Curl_GetFile((server_url + requestPath + "?"
-			+ "game_cd=" + game_cd + "&"
-			+ "net_id=" + net_id + "&"
-			+ "serial=" + serial),
-			dl_image_path
-		);
-		
+		std::string downloadUrl;
+		if (!external_update_url.empty()) {
+			downloadUrl = external_update_url;
+		}
+		else {
+			downloadUrl = server_url + "updater_getfile" + "?"
+				+ "game_cd=" + game_cd + "&"
+				+ "net_id=" + net_id + "&"
+				+ "serial=" + serial;
+		}
+
+		int downloadStatus = Curl_GetFile(downloadUrl, dl_image_path);
+
 		if (downloadStatus == 0) { // Download Success
 			// DO Extract
 
@@ -285,7 +291,7 @@ private:
 	void checkFileIntegrity() {
 
 		std::string requestPath = "updater_getfileinfo";
-		std::string responseData = Curl_Get(server_url + requestPath + "?" 
+		std::string responseData = Curl_Get(server_url + requestPath + "?"
 			+ "game_cd=" + game_cd + "&"
 			+ "net_id=" + net_id + "&"
 			+ "serial=" + serial
@@ -300,7 +306,7 @@ private:
 
 				json j = json::parse(responseData);
 				NetworkDebugStringA(j.dump(4));
-				
+
 				auto updateInfo = j["updateInfo"];
 
 				for (const auto& item : updateInfo) {
@@ -369,6 +375,10 @@ private:
 				if (j.contains("revision")) {
 					revisionFromServer = j["revision"];
 					this->target_rev = revisionFromServer;
+				}
+
+				if (j.contains("updateUrl")) {
+					this->external_update_url = j["updateUrl"];
 				}
 
 				if (revisionFromServer == revision) {
